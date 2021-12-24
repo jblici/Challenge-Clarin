@@ -1,9 +1,11 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const mysql = require('mysql');
 
+const { PASSWORD_DB } = process.env;
 const { BASE_URL, API_KEY } = require('./constants')
 
 const server = express();
@@ -22,7 +24,7 @@ server.use((req, res, next) => {
 const db = mysql.createConnection({
     user: 'root',
     host: 'Localhost',
-    password: 'estancias123',
+    password: PASSWORD_DB,
     database: 'clarin'
 });
 
