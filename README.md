@@ -17,9 +17,7 @@
 
 __IMPORTANTE:__ Es necesario contar minimamente con la última versión estable de Node y NPM. Asegurarse de contar con ella para poder instalar correctamente las dependecias necesarias para correr el proyecto.
 
-## BoilerPlate
-
-El boilerplate cuenta con dos carpetas: `server` y `client`. En estas carpetas estará el código del back-end y el front-end respectivamente.
+## Pasos para correr App
 
 En `server` crear un archivo llamado: `.env` que tenga la siguiente forma:
 
