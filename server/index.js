@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const axios = require('axios');
 const mysql = require('mysql');
 
-const { PASSWORD_DB } = process.env;
+const { DB_PASS, DB_USER, DB_HOST, DB_DATABASE } = process.env;
 const { BASE_URL, API_KEY } = require('./constants')
 
 const server = express();
@@ -22,18 +22,15 @@ server.use((req, res, next) => {
   });
 
 const db = mysql.createConnection({
-    user: 'root',
-    host: 'Localhost',
-    password: PASSWORD_DB,
-    database: 'clarin'
+    user: DB_USER || 'root',
+    host: DB_HOST || 'Localhost',
+    password: DB_PASS,
+    database: DB_DATABASE || 'clarin'
 });
 
 server.get('/', compareUrls)
 
 server.get('/history', fetchHistory)
-server.get('/hola', function(req,res) {
-    res.send('hola')
-})
 
 async function compareUrls (req, res, next) {
     const { url1, url2 } = req.query
