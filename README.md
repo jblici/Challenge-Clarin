@@ -1,5 +1,5 @@
 <p align='left'>
-    <img src='https://www.clarin.com/static/CLAClarin/images/Clarin-sahreing-fbk.png' </img>
+    <img height="100" width="100" src='https://www.clarin.com/static/CLAClarin/images/Clarin-sahreing-fbk.png'</img>
 </p>
 
 # Clarin Challenge - Full Stack Developer 
