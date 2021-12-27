@@ -4,6 +4,9 @@
 
 # Clarin Challenge - Full Stack Developer 
 
+# APP DEPLOYED: https://react-clarin-mthp8142l-jblici.vercel.app/
+
+
 ## Objetivos del Proyecto
 
 - Construir una App que compare dos valores de SEO entre dos sitios.
