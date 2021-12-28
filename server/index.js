@@ -7,6 +7,7 @@ const mysql = require('mysql');
 
 const { DB_PASS, DB_USER, DB_HOST, DB_DATABASE } = process.env;
 const { BASE_URL, API_KEY } = require('./constants')
+const port = process.env.PORT || 3001
 
 const server = express();
 
@@ -36,44 +37,56 @@ async function compareUrls (req, res, next) {
     const { url1, url2 } = req.query
     let ids = [];
 
-    try {
-        const web1 = await axios.get(`${BASE_URL}${url1}&key=${API_KEY}`)
-        const web2 = await axios.get(`${BASE_URL}${url2}&key=${API_KEY}`)
-        console.log(web1.data.lighthouseResult.audits['speed-index']['displayValue'])
-        console.log(web1.data.lighthouseResult.audits['interactive']['displayValue'])
+    const webPromise1 = axios.get(`${BASE_URL}${url1}&key=${API_KEY}`)
+    const webPromise2 = axios.get(`${BASE_URL}${url2}&key=${API_KEY}`)
 
-        const queryWeb1 = await db.query('INSERT INTO url_stats (name, speed, time) VALUES (?,?,?)',
-        [url1, web1.data.lighthouseResult.audits['speed-index']['displayValue'], web1.data.lighthouseResult.audits['interactive']['displayValue']], 
-        function (err, result) {
-            if(err) console.log(err);
-            console.log('Values Inserted')
-            setIds(result.insertId)
-        })
+    Promise.all([webPromise1, webPromise2])
+    .then(response => {
+      let [web1, web2] = response;
 
-        const queryWeb2 = await db.query('INSERT INTO url_stats (name, speed, time) VALUES (?,?,?)',
-        [url2, web2.data.lighthouseResult.audits['speed-index']['displayValue'], web2.data.lighthouseResult.audits['interactive']['displayValue']], 
-        function (err, result) {
-            if(err) console.log(err);
-            setIds(result.insertId)
-            console.log('Values inserted');
-        })
+      const resultWeb1 = [
+        url1,
+        web1.data.lighthouseResult.audits['speed-index']['displayValue'],
+        web1.data.lighthouseResult.audits['interactive']['displayValue'],
+      ];
+      const resultWeb2 = [
+        url2,
+        web2.data.lighthouseResult.audits['speed-index']['displayValue'],
+        web2.data.lighthouseResult.audits['interactive']['displayValue'],
+      ];
+      
+      res.send({ url1: resultWeb1, url2: resultWeb2 });
+      
+      db.query('INSERT INTO url_stats (name, speed, time) VALUES (?,?,?)',
+      [url1, web1.data.lighthouseResult.audits['speed-index']['displayValue'], web1.data.lighthouseResult.audits['interactive']['displayValue']],
+      function (err, result) {
+          if(err) console.log(err);
+          setIds(result.insertId)
+      })
 
-        function setIds(value) {
-            ids.push(value);
-            if (ids.length >= 2) {
-                db.query('INSERT INTO comparison (id_url_1, id_url_2) VALUES (?,?)',
-                [ids[0], ids[1]],
-                function (err, result) {
-                    if(err) console.log(err)
-                    console.log('Insert into comparison table success')
-                })
-            }
-        }
-        res.status(200).json({ url1: queryWeb1.values, url2: queryWeb2.values });
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ message: "Algo salio mal!" });
-    }
+      db.query('INSERT INTO url_stats (name, speed, time) VALUES (?,?,?)',
+      [url2, web2.data.lighthouseResult.audits['speed-index']['displayValue'], web2.data.lighthouseResult.audits['interactive']['displayValue']],
+      function (err, result) {
+          if(err) console.log(err);
+          setIds(result.insertId)
+      })
+
+      function setIds(value) {
+          ids.push(value);
+          if (ids.length >= 2) {
+              db.query('INSERT INTO comparison (id_url_1, id_url_2) VALUES (?,?)',
+              [ids[0], ids[1]],
+              function (err, result) {
+                  if(err) throw(err)
+                  console.log('Insert into comparison table success')
+              })
+          }
+      }
+    })
+    .catch(error => {
+      console.log(error)
+      res.send({ message: "Algo salio mal!" });
+    });
 }
 
 function fetchHistory(req,res,next) {
@@ -82,6 +95,10 @@ function fetchHistory(req,res,next) {
         db.query(query, 
         function(err, result) {
             if (err) console.log(err)
+            if(result.length >= 10) {
+                let shortResult = result.splice(result.length - 10, result.length)
+                res.send(shortResult.reverse())
+            }
             res.send(result.reverse())
         })
     } catch (error) {
@@ -89,6 +106,6 @@ function fetchHistory(req,res,next) {
     }
 }
 
-server.listen(3001, () => {
-    console.log('listening to port 3001')
+server.listen(port, () => {
+    console.log(`listening to port ${port}`)
 })

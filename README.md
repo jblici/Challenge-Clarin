@@ -4,23 +4,11 @@
 
 # Clarin Challenge - Full Stack Developer 
 
-# APP DEPLOYED: https://react-clarin-mthp8142l-jblici.vercel.app/
+Lamentablemente me tope con un problema de Heroku que tiene un timeout el cual no permite que el http request supere los 30 segundos, es por eso que presento estas opciones.
 
+# 3 Opciones para probar la App
 
-## Objetivos del Proyecto
-
-- Construir una App que compare dos valores de SEO entre dos sitios.
-- Procesar dos urls con la API de google (Pagespeed) y comparar los datos de Speed Index y Time to Interactive
-- Crear un Frontend donde se puedan ingresar las dos urls a comparar y que muestre los valores obtenidos en el backend en forma de tabla comparativa.
-
-## Comenzando
-
- 1. Forkear el repositorio para tener una copia del mismo en sus cuentas.
- 2. Clonar el repositorio en sus computadoras para comenzar a trabajar.
-
-__IMPORTANTE:__ Es necesario contar minimamente con la última versión estable de Node y NPM. Asegurarse de contar con ella para poder instalar correctamente las dependecias necesarias para correr el proyecto.
-
-## Pasos para correr App
+# __#1 Local (Pasos para correr App)__
 
 En `server` crear un archivo llamado: `.env` que tenga la siguiente forma:
 
@@ -52,12 +40,47 @@ El modelo de la base de datos las cree con las siguientes entidades:
   - id_url_1 fk
   - id_url_2 fk
 
-# __Una vez terminado todos estos pasos podemos hacer npm install tanto en client como server y luego npm start y podemos comenzar a disfrutar la aplicacion.__
+#### Correr script
 
-#### Tecnologías usadas:
-- [ ] React
-- [ ] Express
-- [ ] MySQL
+```
+CREATE SCHEMA `clarin` ;
+
+CREATE TABLE `clarin`.`url_stats` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `speed` VARCHAR(45) NOT NULL,
+  `time` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`));
+
+CREATE TABLE `clarin`.`comparison` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `id_url_1` INT NOT NULL,
+  `id_url_2` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `id_url_1_idx` (`id_url_1` ASC) VISIBLE,
+  INDEX `id_url_2_idx` (`id_url_2` ASC) VISIBLE,
+  CONSTRAINT `id_url_1`
+    FOREIGN KEY (`id_url_1`)
+    REFERENCES `clarin`.`url_stats` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `id_url_2`
+    FOREIGN KEY (`id_url_2`)
+    REFERENCES `clarin`.`url_stats` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+```
+
+## __Una vez terminado todos estos pasos podemos hacer npm install tanto dentro de client como server, luego npm start en ambos a disfrutar la aplicacion.__
+
+# __#2 Client Local Back Heroku__ 
+
+En `client` solamente reemplazar en la linea 41 y 45 el endpoint https://clarin-challenge.herokuapp.com por https://localhost:3001
+
+Luego correr npm install y start en la carpeta client. Esta opcion hay veces que no supera los 30 segundos y funciona correctamente. 
+
+
+# __#3 APP DEPLOYED: https://react-clarin.vercel.app/ con Back Heroku https://clarin-challenge.herokuapp.com__
 
 Espero que les guste y lo disfruten tanto como yo lo hice al hacerlo.
 

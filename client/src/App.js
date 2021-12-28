@@ -38,7 +38,7 @@ function App() {
     try {
       setInfo(false)
       setLoader(true)
-      const data = await axios.get(`https://clarin-challenge.herokuapp.com/?url1=${web1}&url2=${web2}`)
+      const data = await axios.get(`https://localhost:3001/?url1=${web1}&url2=${web2}`)
       setInfoUrl1(data.data.url1)
       setInfoUrl2(data.data.url2)
       setInfo(true)
@@ -49,13 +49,12 @@ function App() {
   }
   
   useEffect(() => {
-    axios.get('https://clarin-challenge.herokuapp.com/history')
+    axios.get('https://localhost:3001/history')
     .then((response) => {
       console.log('history',response.data)
-      let reverse = response.data.reverse()
-      setHistory(reverse)
+      setHistory(response.data)
     })
-  }, [])
+  }, [info])
 
 
   return (
