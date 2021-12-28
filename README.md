@@ -28,20 +28,6 @@ Adicionalmente será necesario que creen desde mysql una base de datos llamada `
 
 #### Base de datos
 
-El modelo de la base de datos las cree con las siguientes entidades:
-
-- [ ] url_stats:
-  - id pk
-  - name 
-  - speed (Speed-Index)
-  - time (Time-to-Interactive)
-- [ ] comparison:
-  - id pk
-  - id_url_1 fk
-  - id_url_2 fk
-
-#### Correr script
-
 ```
 CREATE SCHEMA `clarin` ;
 
