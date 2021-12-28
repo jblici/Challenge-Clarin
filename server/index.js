@@ -42,46 +42,46 @@ async function compareUrls (req, res, next) {
 
     Promise.all([webPromise1, webPromise2])
     .then(response => {
-      let [web1, web2] = response;
+        let [web1, web2] = response;
 
-      const resultWeb1 = [
-        url1,
-        web1.data.lighthouseResult.audits['speed-index']['displayValue'],
-        web1.data.lighthouseResult.audits['interactive']['displayValue'],
-      ];
-      const resultWeb2 = [
-        url2,
-        web2.data.lighthouseResult.audits['speed-index']['displayValue'],
-        web2.data.lighthouseResult.audits['interactive']['displayValue'],
-      ];
+        const resultWeb1 = [
+            url1,
+            web1.data.lighthouseResult.audits['speed-index']['displayValue'],
+            web1.data.lighthouseResult.audits['interactive']['displayValue'],
+        ];
+        const resultWeb2 = [
+            url2,
+            web2.data.lighthouseResult.audits['speed-index']['displayValue'],
+            web2.data.lighthouseResult.audits['interactive']['displayValue'],
+        ];
       
-      res.send({ url1: resultWeb1, url2: resultWeb2 });
+        res.send({ url1: resultWeb1, url2: resultWeb2 });
       
-      db.query('INSERT INTO url_stats (name, speed, time) VALUES (?,?,?)',
-      [url1, web1.data.lighthouseResult.audits['speed-index']['displayValue'], web1.data.lighthouseResult.audits['interactive']['displayValue']],
-      function (err, result) {
-          if(err) console.log(err);
-          setIds(result.insertId)
-      })
-
-      db.query('INSERT INTO url_stats (name, speed, time) VALUES (?,?,?)',
-      [url2, web2.data.lighthouseResult.audits['speed-index']['displayValue'], web2.data.lighthouseResult.audits['interactive']['displayValue']],
-      function (err, result) {
-          if(err) console.log(err);
-          setIds(result.insertId)
-      })
-
-      function setIds(value) {
-          ids.push(value);
-          if (ids.length >= 2) {
-              db.query('INSERT INTO comparison (id_url_1, id_url_2) VALUES (?,?)',
-              [ids[0], ids[1]],
-              function (err, result) {
-                  if(err) throw(err)
-                  console.log('Insert into comparison table success')
-              })
-          }
-      }
+        db.query('INSERT INTO url_stats (name, speed, time) VALUES (?,?,?)',
+        [url1, web1.data.lighthouseResult.audits['speed-index']['displayValue'], web1.data.lighthouseResult.audits['interactive']['displayValue']],
+        function (err, result) {
+            if(err) console.log(err);
+            setIds(result.insertId)
+        })
+        
+        db.query('INSERT INTO url_stats (name, speed, time) VALUES (?,?,?)',
+        [url2, web2.data.lighthouseResult.audits['speed-index']['displayValue'], web2.data.lighthouseResult.audits['interactive']['displayValue']],
+        function (err, result) {
+            if(err) console.log(err);
+            setIds(result.insertId)
+        })
+        
+        function setIds(value) {
+            ids.push(value);
+            if (ids.length >= 2) {
+                db.query('INSERT INTO comparison (id_url_1, id_url_2) VALUES (?,?)',
+                [ids[0], ids[1]],
+                function (err, result) {
+                    if(err) throw(err)
+                    console.log('Insert into comparison table success')
+                })
+            }
+        }
     })
     .catch(error => {
       console.log(error)
@@ -98,8 +98,9 @@ function fetchHistory(req,res,next) {
             if(result.length >= 10) {
                 let shortResult = result.splice(result.length - 10, result.length)
                 res.send(shortResult.reverse())
+            } else {
+                res.send(result.reverse())
             }
-            res.send(result.reverse())
         })
     } catch (error) {
         console.log(error)
